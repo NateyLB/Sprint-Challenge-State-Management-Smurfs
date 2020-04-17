@@ -1,22 +1,23 @@
 import React, { useEffect, useState } from "react";
 import { connect } from 'react-redux';
-import { v4 as uuid } from 'uuid';
 
 
-import { fetchSmurf, postSmurf } from '../actions/smurfAction.js'
+
+import { fetchSmurf, postSmurf, deleteSmurf } from '../actions/smurfAction.js'
 
 import SmurfCard from './smurfCard.js'
 import "./App.css";
 
 const App = props => {
 
-  const [smurfs, setSmurfs] = useState([]);
-  const [newSmurf, setNewSmurf] = useState({ name: '', age: '', height: '', id: uuid() })
+  const [newSmurf, setNewSmurf] = useState({ name: '', age: '', height: '', id:'' })
   useEffect(() => {
     props.fetchSmurf();
-  }, [])
+  },[])
+  
+
   const smurfCards = props.smurfs.smurfs.map(element => {
-    return <SmurfCard name={element.name} age={element.age} height={element.height} key={element.id} />
+    return <SmurfCard smurf={element} deleteSmurf={deleteSmurf} setNewSmurf={setNewSmurf} key={element.id} />
   })
 
   const inputChange = event => {
@@ -32,22 +33,21 @@ const App = props => {
   const submitNewSmurf = event =>{
     event.preventDefault();
     props.postSmurf(newSmurf)
-    setNewSmurf({name:'', age:'', height:'', id:uuid()})
+    setNewSmurf({name:'', age:'', height:'', id:''})
   }
-
 
   return (
     <div className="App">
       <h1>SMURFS! 2.0 W/ Redux</h1>
       <div>{smurfCards}</div>
       <h3>Add a smurf</h3>
-      <form>
+      <form onSubmit={event => submitNewSmurf(event)}>
         <label htmlFor="name">
           Name:
           <input name="name" type="text" onChange={inputChange} />
         </label>
         <label htmlFor="age">
-          Age:
+          Age(in years):
           <input name="age" type="text" onChange={inputChange} />
         </label>
         <label htmlFor="height">
@@ -69,5 +69,5 @@ const mapStateToProps = state => {
 
 export default connect(
   mapStateToProps,
-  { fetchSmurf, postSmurf }
+  { fetchSmurf, postSmurf, deleteSmurf }
 )(App)
